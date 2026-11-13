@@ -1,0 +1,156 @@
+@page "/"
+@page "/HydrBV"
+@using FPY.CoreBussines
+@using FPY.UseCase
+@inject IGetHydrBVResultsWeeklyFpyUseCase GetWeeklyFPY
+@inject IGetHydrBVResultsMonthlyFpyUseCase GetMonthlyFPY
+
+<PageTitle>HydrBV FPY</PageTitle>
+
+<div class="d-flex gap-3">
+    <div class="card mb-3">
+        <div class="card-body">
+            @foreach (var result in _weeklyresults?.Take(1))
+            {
+                <h5 class="card-title">FPY za ostatni tydzień</h5>
+                <p class="card-text fs-2 fw-bold mb-0">@result.FPY.ToString("0.00")%</p>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            @foreach (var result in _monthlyresults?.Take(1))
+            {
+                <h5 class="card-title">FPY za ostatni miesiąc</h5>
+                <p class="card-text fs-2 fw-bold mb-0">@result.FPY.ToString("0.00")%</p>
+            }
+        </div>
+    </div>
+    
+    <div class="card mb-3">
+        <div class="card-body">
+            @foreach (var result in _monthlyresults?.Take(1))
+            {
+                <h5 class="card-title">sztuki OK w ostatnim miesiącu</h5>
+                <p class="card-text fs-2 fw-bold mb-0">@result.OK.ToString("0")</p>
+            }
+        </div>
+    </div>
+        <div class="card mb-3">
+        <div class="card-body">
+            @foreach (var result in _monthlyresults?.Take(1))
+            {
+                <h5 class="card-title">sztuki NOK w ostatnim miesiącu</h5>
+                <p class="card-text fs-2 fw-bold mb-0">@result.NOK.ToString("0")</p>
+            }
+        </div>
+    </div>
+
+</div>
+
+
+<h1>Weekly FPY</h1>
+
+@if (_weeklyresults is null)
+{
+    <p>Ladowanie wynik&oacute;w...</p>
+}
+else if (_weeklyresults.Count == 0)
+{
+    <p>Brak wynik&oacute;w FPY.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rok</th>
+                <th>Tydzie&#324;</th>
+                <th>OK</th>
+                <th>NOK</th>
+                <th>ALL</th>
+                <th>FPY</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (WeeklyFpy result in _weeklyresults.Take(15))
+            {
+                <tr>
+                    <td>@result.Year</td>
+                    <td>@result.Week</td>
+                    <td>@result.OK</td>
+                    <td>@result.NOK</td>
+                    <td>@result.ALL</td>
+                    <td style="@GetFpyStyle(result.FPY)">@result.FPY.ToString("0.00")%</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<h1>Monthly FPY</h1>
+
+@if (_monthlyresults is null)
+{
+    <p>Ladowanie wynik&oacute;w...</p>
+}
+else if (_monthlyresults.Count == 0)
+{
+    <p>Brak wynik&oacute;w FPY.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rok</th>
+                <th>Miesiąc</th>
+                <th>OK</th>
+                <th>NOK</th>
+                <th>ALL</th>
+                <th>FPY</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (MonthlyFpy result in _monthlyresults.Take(15))
+            {
+                <tr>
+                    <td>@result.Year</td>
+                    <td>@result.MonthName</td>
+                    <td>@result.OK</td>
+                    <td>@result.NOK</td>
+                    <td>@result.ALL</td>
+                    <td style="@GetFpyStyle(result.FPY)">@result.FPY.ToString("0.00")%</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private List<WeeklyFpy>? _weeklyresults = new();
+    private List<MonthlyFpy>? _monthlyresults = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _weeklyresults = await GetWeeklyFPY.ExecuteAsync();
+        _monthlyresults = await GetMonthlyFPY.ExecuteAsync();
+    }
+    private static string GetFpyStyle(decimal fpy)
+    {
+        var (backgroundColor, textColor) = fpy >= 97
+            ? ("#d1e7dd", "#0f5132")
+            : fpy >= 90
+                ? ("#fff3cd", "#664d03")
+                : ("#f8d7da", "#842029");
+
+        return $"background-color: {backgroundColor} !important; " +
+               $"box-shadow: inset 0 0 0 9999px {backgroundColor} !important; " +
+               $"color: {textColor} !important;";
+    }
+
+
+
+
+}
