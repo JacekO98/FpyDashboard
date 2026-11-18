@@ -1,0 +1,144 @@
+@using FPY.CoreBussines
+
+<PageTitle>@Title — FPY Dashboard</PageTitle>
+
+<section class="dashboard-heading">
+    <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> RAPORT JAKOŚCI</div>
+        <h1>@Title</h1>
+        <p class="dashboard-subtitle">Wskaźniki First Pass Yield i wyniki produkcji w ujęciu tygodniowym oraz miesięcznym.</p>
+    </div>
+    <div class="heading-chip"><span class="status-dot"></span> Monitoring FPY</div>
+</section>
+
+<section class="metrics-grid" aria-label="Podsumowanie wyników">
+    <article class="metric-card metric-primary @GetMetricClass(WeeklyResults, result => result.FPY)">
+        <div class="metric-topline"><span>OSTATNI TYDZIEŃ</span><span class="metric-marker @WeeklyTrend.Class" title="@WeeklyTrend.Label" aria-label="@WeeklyTrend.Label">@WeeklyTrend.Icon</span></div>
+        @if (WeeklyResults is null)
+        {
+            <div class="metric-value metric-loading">—</div>
+        }
+        else if (WeeklyResults.FirstOrDefault() is { } week)
+        {
+            <div class="metric-value">@week.FPY.ToString("0.00")<span class="metric-unit">%</span></div>
+            <div class="metric-footnote">Tydzień @week.Week, @week.Year</div>
+        }
+        else { <div class="metric-value metric-loading">—</div><div class="metric-footnote">Brak danych tygodniowych</div> }
+    </article>
+    <article class="metric-card @GetMetricClass(MonthlyResults, result => result.FPY)">
+        <div class="metric-topline"><span>OSTATNI MIESIĄC</span><span class="metric-marker @MonthlyTrend.Class" title="@MonthlyTrend.Label" aria-label="@MonthlyTrend.Label">@MonthlyTrend.Icon</span></div>
+        @if (MonthlyResults is null)
+        {
+            <div class="metric-value metric-loading">—</div>
+        }
+        else if (MonthlyResults.FirstOrDefault() is { } month)
+        {
+            <div class="metric-value">@month.FPY.ToString("0.00")<span class="metric-unit">%</span></div>
+            <div class="metric-footnote">@month.MonthName @month.Year</div>
+        }
+        else { <div class="metric-value metric-loading">—</div><div class="metric-footnote">Brak danych miesięcznych</div> }
+    </article>
+    <article class="metric-card">
+        <div class="metric-topline"><span>SZTUKI OK · MIESIĄC</span><span class="metric-marker metric-marker-good">✓</span></div>
+        @if (MonthlyResults?.FirstOrDefault() is { } goodMonth)
+        {
+            <div class="metric-value">@goodMonth.OK.ToString("N0")</div>
+            <div class="metric-footnote">Pierwsze przejście bez błędów</div>
+        }
+        else { <div class="metric-value metric-loading">—</div><div class="metric-footnote">Oczekiwanie na dane</div> }
+    </article>
+    <article class="metric-card">
+        <div class="metric-topline"><span>SZTUKI NOK · MIESIĄC</span><span class="metric-marker metric-marker-bad">!</span></div>
+        @if (MonthlyResults?.FirstOrDefault() is { } rejectMonth)
+        {
+            <div class="metric-value">@rejectMonth.NOK.ToString("N0")</div>
+            <div class="metric-footnote">Wymagały poprawy lub kontroli</div>
+        }
+        else { <div class="metric-value metric-loading">—</div><div class="metric-footnote">Oczekiwanie na dane</div> }
+    </article>
+</section>
+
+<div class="reports-grid">
+    <section class="report-card">
+        <div class="report-header">
+            <div><div class="report-kicker">TREND PRODUKCJI</div><h2>Wyniki tygodniowe</h2></div>
+            <span class="period-count">Ostatnie 15</span>
+        </div>
+        @if (WeeklyResults is null)
+        {
+            <div class="table-state"><span class="loading-dot"></span> Ładowanie wyników…</div>
+        }
+        else if (WeeklyResults.Count == 0)
+        {
+            <div class="table-state">Brak wyników tygodniowych do wyświetlenia.</div>
+        }
+        else
+        {
+            <div class="table-scroll"><table class="results-table">
+                <thead><tr><th>OKRES</th><th class="numeric">OK</th><th class="numeric">NOK</th><th class="numeric">RAZEM</th><th class="numeric">FPY</th></tr></thead>
+                <tbody>
+                    @foreach (var result in WeeklyResults.Take(15))
+                    {
+                        <tr><td><span class="period-primary">Tydzień @result.Week</span><span class="period-secondary">@result.Year</span></td><td class="numeric">@result.OK.ToString("N0")</td><td class="numeric">@result.NOK.ToString("N0")</td><td class="numeric total-cell">@result.ALL.ToString("N0")</td><td class="numeric"><span class="fpy-pill @GetFpyClass(result.FPY)">@result.FPY.ToString("0.00")%</span></td></tr>
+                    }
+                </tbody>
+            </table></div>
+        }
+    </section>
+
+    <section class="report-card">
+        <div class="report-header">
+            <div><div class="report-kicker">PODSUMOWANIE PRODUKCJI</div><h2>Wyniki miesięczne</h2></div>
+            <span class="period-count">Ostatnie 15</span>
+        </div>
+        @if (MonthlyResults is null)
+        {
+            <div class="table-state"><span class="loading-dot"></span> Ładowanie wyników…</div>
+        }
+        else if (MonthlyResults.Count == 0)
+        {
+            <div class="table-state">Brak wyników miesięcznych do wyświetlenia.</div>
+        }
+        else
+        {
+            <div class="table-scroll"><table class="results-table">
+                <thead><tr><th>OKRES</th><th class="numeric">OK</th><th class="numeric">NOK</th><th class="numeric">RAZEM</th><th class="numeric">FPY</th></tr></thead>
+                <tbody>
+                    @foreach (var result in MonthlyResults.Take(15))
+                    {
+                        <tr><td><span class="period-primary">@result.MonthName</span><span class="period-secondary">@result.Year</span></td><td class="numeric">@result.OK.ToString("N0")</td><td class="numeric">@result.NOK.ToString("N0")</td><td class="numeric total-cell">@result.ALL.ToString("N0")</td><td class="numeric"><span class="fpy-pill @GetFpyClass(result.FPY)">@result.FPY.ToString("0.00")%</span></td></tr>
+                    }
+                </tbody>
+            </table></div>
+        }
+    </section>
+</div>
+
+<div class="dashboard-footnote"><span class="footnote-mark">i</span> FPY pokazuje odsetek produktów poprawnych za pierwszym razem. Kolory pomagają szybko ocenić wynik.</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public List<WeeklyFpy>? WeeklyResults { get; set; }
+    [Parameter] public List<MonthlyFpy>? MonthlyResults { get; set; }
+
+    private (string Icon, string Class, string Label) WeeklyTrend => GetTrend(WeeklyResults, result => result.FPY);
+    private (string Icon, string Class, string Label) MonthlyTrend => GetTrend(MonthlyResults, result => result.FPY);
+
+    private static (string Icon, string Class, string Label) GetTrend<T>(List<T>? results, Func<T, decimal> getFpy)
+    {
+        if (results is not { Count: > 1 })
+            return ("–", "metric-marker-neutral", "Brak poprzedniego wyniku do porównania");
+
+        var difference = getFpy(results[0]) - getFpy(results[1]);
+        return difference > 0
+            ? ("↑", "metric-marker-up", "Wynik wzrósł względem poprzedniego okresu")
+            : difference < 0
+                ? ("↓", "metric-marker-down", "Wynik spadł względem poprzedniego okresu")
+                : ("→", "metric-marker-neutral", "Wynik bez zmian względem poprzedniego okresu");
+    }
+
+    private static string GetMetricClass<T>(List<T>? results, Func<T, decimal> getFpy) =>
+        results is { Count: > 0 } ? GetFpyClass(getFpy(results[0])) : "metric-pending";
+
+    private static string GetFpyClass(decimal fpy) => fpy >= 97 ? "fpy-good" : fpy >= 90 ? "fpy-mid" : "fpy-low";
+}

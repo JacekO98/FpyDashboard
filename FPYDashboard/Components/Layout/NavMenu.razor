@@ -1,29 +1,20 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">FPYDashboard</a>
+<div class="brand-lockup">
+    <a class="brand-mark" href="/" aria-label="FPY Dashboard — strona główna">F</a>
+    <div class="brand-copy">
+        <span class="brand-name">FPY Dashboard</span>
+        <span class="brand-caption">Wskaźniki jakości</span>
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="HydrBV" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> HydrBV
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Hydr" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Hydr
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Pneu" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Pneu
-            </NavLink>
-        </div>
-
-    </nav>
-</div>
-
+<div class="nav-section-label">OBSZARY PRODUKCJI</div>
+<nav class="area-nav" aria-label="Obszary produkcji">
+    <NavLink class="area-link" href="/" Match="NavLinkMatch.All">
+        <span class="area-icon">HB</span><span class="area-name">HydrBV</span><span class="nav-chevron">›</span>
+    </NavLink>
+    <NavLink class="area-link" href="Hydr">
+        <span class="area-icon">HY</span><span class="area-name">Hydr</span><span class="nav-chevron">›</span>
+    </NavLink>
+    <NavLink class="area-link" href="Pneu">
+        <span class="area-icon">PN</span><span class="area-name">Pneu</span><span class="nav-chevron">›</span>
+    </NavLink>
+</nav>
