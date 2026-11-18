@@ -77,3 +77,5 @@ FPYDashboard.sln
 - A product is counted once per `Serial_Nr`, using its earliest test record in the corresponding source table.
 - Weekly grouping uses the source table's `Week_of_the_Year` value.
 - Results are read directly from SQL Server when a dashboard route is rendered; unavailable database connectivity or missing tables will prevent the results from loading.
+## Screen shot
+<img width="1896" height="865" alt="image" src="https://github.com/user-attachments/assets/89daa9e0-fa52-4427-87a5-71727f236d70" />
